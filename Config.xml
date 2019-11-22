@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<configuration>
+	<ApplicationLevel>test</ApplicationLevel>
+	<TestKeyFile>./your_test_key.txt</TestKeyFile>
+	<ProdKeyFile>./your_prod_key.txt</ProdKeyFile>
+	<TestBaseUrl>https://yourtestinstance.test.instructure.com/api/v1/accounts/1/</TestBaseUrl>
+	<ProdBaseUrl>https://canvas.prod.com/api/v1/accounts/1/</ProdBaseUrl>
+	<TestBatchTermsFile>./terms_to_batch_import.csv</TestBatchTermsFile>
+	<ProdBatchTermsFile>./terms_to_batch_import.csv</ProdBatchTermsFile>
+	<SISDataDirectory>\\path\to\sis\exports\</SISDataDirectory>
+</configuration>
