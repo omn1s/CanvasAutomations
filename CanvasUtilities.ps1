@@ -15,7 +15,7 @@ Function Invoke-WebRequestWithRetry {
 		[Int]
 		$SecondsWaitBetweenTries	
 	)
-	
+	$IsSuccessfulResponse = $False
 	$RetryCount = -1
 	do {
 		$RetryCount += 1
