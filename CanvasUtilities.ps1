@@ -2,6 +2,16 @@
 
 $Config = @{}
 
+Function Log-ResponseObject {
+	Param(
+		[Parameter(Mandatory=$True,Position=0)]
+		$ResponseObject
+	)
+	Out-File -FilePath $Config.LogFile -InputObject "Logging response object" -append
+	Out-File -FilePath $Config.LogFile -InputObject $ResponseObject -append
+}
+
+
 Function Invoke-WebRequestWithRetry {
 	Param(
 		[Parameter(Mandatory=$True,Position=0)]
@@ -13,31 +23,50 @@ Function Invoke-WebRequestWithRetry {
 		
 		[Parameter(Mandatory=$True,Position=2)]
 		[Int]
-		$SecondsWaitBetweenTries	
+		$SecondsWaitBetweenTries
 	)
+	
 	$IsSuccessfulResponse = $False
 	$RetryCount = -1
-	do {
+	while (!$IsSuccessfulResponse -and ($RetryCount -le $MaximumRetries))
+	{
+		If ($Request -ne $Null) {
+			Clear-Variable $Request
+		}
+		
 		$RetryCount += 1
+		
 		if ($RetryCount -ge 1) {
 			Start-Sleep -Seconds $SecondsWaitBetweenTries
 		}
 		
-		try	{ 
+		try
+		{ 
 			$Request = Invoke-WebRequest @RequestParameters
-		} catch [System.Net.WebException] {
+			
+			Log-ResponseObject $Request
+		}
+		
+		catch [System.Net.WebException] 
+		{
 			$LogParams = @{
 				Level = "error"
 				Message = "A WebException was caught during an HTTP request: $($_.Exception.Message)"
 			}
 			Log-CanvasAutomations @LogParams
+			
+			Log-ResponseObject $_.Exception
+			
+			If ($_.Exception.Response -ne $Null) 
+			{
+				Log-ResponseObject $_.Exception.Response
+			}
 		}
 		
 		if ($Request.StatusCode -eq 200) {
 			$IsSuccessfulResponse = $True
 		}
-	
-	} until ( $IsSuccessfulResponse -and ($RetryCount -le $MaximumRetries))
+	}
 	
 	If ($IsSuccessfulResponse) 
 	{
